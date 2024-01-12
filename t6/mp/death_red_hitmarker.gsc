@@ -67,7 +67,7 @@ custom_updatedamagefeedback( mod, inflictor, perkfeedback, victim )
 
 	if ( isdefined( victim ) && isplayer( victim ) && damage_feedback_get_dead( victim, mod ) )
 		self.hud_damagefeedback.color = ( 1, 0, 0 );
-	else if ( isdefined( self.hud_damagefeedback.color ) )
+	else if ( isdefined( self.hud_damagefeedback.color ) && self.hud_damagefeedback.color != (1, 1, 1) )
 		self.hud_damagefeedback.color = ( 1, 1, 1 );
 
 	self.hud_damagefeedback.alpha = 1;
