@@ -18,23 +18,18 @@ echo 4. t5mp
 echo 5. t5sp
 echo 6. t4mp
 echo 7. t4sp
-set /P choice=
+choice /c 1234567 /n
+set game_choice=%ERRORLEVEL%
 
-if not %mod%=="" goto:load_mod_prompt_exit
-:load_mod_prompt
-set /P load_mod="Would you like to load a mod (Y/N)? "
-if "%load_mod:Y=y%"=="y" (
-	set /P mod="Enter the mod name> "
-) else if not "%load_mod:N=n%"=="n" (
-	goto:load_mod_prompt
-)
+if not %mod%=="" ( goto:skip_mod_set )
+choice /m "Would you like to load a mod "
+if %ERRORLEVEL% equ 1 ( set /P mod="Enter the mod name> " )
 
-:load_mod_prompt_exit
+:skip_mod_set
 
 cd /D %LOCALAPPDATA%\Plutonium
 
-goto:case_%choice%
-goto:EOF
+goto:case_%game_choice%
 
 :case_1
 set gamepath=%iw5Path:"=%
