@@ -1,11 +1,13 @@
 @echo off
 ::Username
-set username=Unknown Soldier
+set username=Hadi77KSA
 ::Game Paths
 set iw5Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Modern Warfare 3"
 set t6Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops II"
 set t5Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops"
 set t4Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty World at War"
+::Mod name (default "")
+set mod=""
 
 title Plutonium Offline Launcher
 echo Choose a game to launch using Plutonium
@@ -17,6 +19,17 @@ echo 5. t5sp
 echo 6. t4mp
 echo 7. t4sp
 set /P choice=
+
+if not %mod%=="" goto:load_mod_prompt_exit
+:load_mod_prompt
+set /P load_mod="Would you like to load a mod (Y/N)? "
+if "%load_mod:Y=y%"=="y" (
+	set /P mod="Enter the mod name> "
+) else if not "%load_mod:N=n%"=="n" (
+	goto:load_mod_prompt
+)
+
+:load_mod_prompt_exit
 
 cd /D %LOCALAPPDATA%\Plutonium
 
@@ -59,4 +72,4 @@ set game=t4sp
 goto:gamestart
 
 :gamestart
-start bin\plutonium-bootstrapper-win32.exe %game% "%gamepath%" -lan +name "%username%"
+start bin\plutonium-bootstrapper-win32.exe %game% "%gamepath%" -lan +name "%username%" +set fs_game %mod%
