@@ -1,6 +1,6 @@
 @echo off
 ::Username
-set username=Hadi77KSA
+set username=Unknown Soldier
 ::Game Paths
 set iw5Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Modern Warfare 3"
 set t6Path="C:\Program Files (x86)\Steam\steamapps\common\Call of Duty Black Ops II"
