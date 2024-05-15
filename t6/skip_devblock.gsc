@@ -6,6 +6,11 @@ main()
 		setdvar( "scr_skip_devblock", "0" );
 }
 
+init()
+{
+	thread onPlayerConnect();
+}
+
 onPlayerConnect()
 {
 	while ( true )
