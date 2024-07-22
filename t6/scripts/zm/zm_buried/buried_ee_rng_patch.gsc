@@ -87,40 +87,40 @@ unpatch_random_perk_on_ghost_perk()
 
 patch_give_random_perk()
 {
-    random_perk = undefined;
-    vending_triggers = getentarray( "zombie_vending", "targetname" );
-    perks = [];
+	random_perk = undefined;
+	vending_triggers = getentarray( "zombie_vending", "targetname" );
+	perks = [];
 
-    for ( i = 0; i < vending_triggers.size; i++ )
-    {
-        perk = vending_triggers[i].script_noteworthy;
+	for ( i = 0; i < vending_triggers.size; i++ )
+	{
+		perk = vending_triggers[i].script_noteworthy;
 
-        if ( isdefined( self.perk_purchased ) && self.perk_purchased == perk )
-            continue;
+		if ( isdefined( self.perk_purchased ) && self.perk_purchased == perk )
+			continue;
 
-        if ( perk == "specialty_weapupgrade" )
-            continue;
+		if ( perk == "specialty_weapupgrade" )
+			continue;
 
-        if ( !self hasperk( perk ) && !self has_perk_paused( perk ) )
-            perks[perks.size] = perk;
-    }
+		if ( !self hasperk( perk ) && !self has_perk_paused( perk ) )
+			perks[perks.size] = perk;
+	}
 
-    if ( perks.size > 0 )
-    {
-        perks = array_randomize( perks );
+	if ( perks.size > 0 )
+	{
+		perks = array_randomize( perks );
 
 		forced_perk = getdvar( "scr_force_perk" );
 
 		if ( forced_perk != "" && isinarray( perks, forced_perk ) )
 			arrayinsert( perks, forced_perk, 0 );
 
-        random_perk = perks[0];
-        self give_perk( random_perk );
-    }
-    else
-        self playsoundtoplayer( level.zmb_laugh_alias, self );
+		random_perk = perks[0];
+		self give_perk( random_perk );
+	}
+	else
+		self playsoundtoplayer( level.zmb_laugh_alias, self );
 
-    return random_perk;
+	return random_perk;
 }
 
 patch_maze_levers()
@@ -132,12 +132,12 @@ patch_maze_levers()
 
 sq_ml_watch_trigger()
 {
-    while ( !isdefined( self.trig ) )
+	while ( !isdefined( self.trig ) )
 		wait 1;
 
 	for (;;)
-    {
-        self.trig waittill( "trigger" );
+	{
+		self.trig waittill( "trigger" );
 		wait 0.05;
 		self.n_flip_number = self.n_lever_order;
 	}
