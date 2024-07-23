@@ -43,6 +43,7 @@ patch_box()
 	patch_weapons[patch_weapons.size] = "slowgun_zm";
 	patch_weapons[patch_weapons.size] = "time_bomb_zm";
 	patch_weapons = array_randomize( patch_weapons );
+	flag_wait( "initial_players_connected" );
 	// desired_max_target_of_hits = 2;
 
 	// for ( i = 0; i < desired_max_target_of_hits - patch_weapons.size; i++ )
@@ -51,7 +52,6 @@ patch_box()
 	// 	wait 5;
 	// }
 
-	flag_wait( "initial_players_connected" );
 	prev_func = level.custom_magic_box_selection_logic;
 	level.custom_magic_box_selection_logic = ::force_patch_weapon;
 	pap_triggers = getentarray( "specialty_weapupgrade", "script_noteworthy" );
@@ -82,10 +82,22 @@ force_patch_weapon( weapon, player, pap_triggers )
 patch_2nd_drop_max_ammo()
 {
 	flag_wait( "zombie_drop_powerups" );
-	wait 0.05;
-	arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
-	level waittill( "powerup_dropped" );
-	arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index );
+
+	for (;;)
+	{
+		wait 0.05;
+		arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
+		prev_value = level.zombie_powerup_index;
+
+		do
+			level waittill( "powerup_dropped" );
+		while ( level.zombie_powerup_index == prev_value )
+
+		arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index );
+
+		while ( level.zombie_powerup_index != 0 )
+			level waittill( "powerup_dropped" );
+	}
 }
 
 unpatch_random_perk_on_ghost_perk()
