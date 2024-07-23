@@ -84,20 +84,14 @@ patch_2nd_drop_max_ammo()
 	flag_wait( "zombie_drop_powerups" );
 	wait 0.05;
 
-	// for (;;)
-	// {
-		arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
-		prev_value = level.zombie_powerup_index;
+	arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
+	prev_value = level.zombie_powerup_index;
 
-		do
-			level waittill( "powerup_dropped" );
-		while ( level.zombie_powerup_index == prev_value )
+	do
+		level waittill( "powerup_dropped" );
+	while ( level.zombie_powerup_index == prev_value )
 
-		arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index );
-
-	//	while ( level.zombie_powerup_index != 0 )
-	//		level waittill( "powerup_dropped" );
-	// }
+	arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index );
 }
 
 unpatch_random_perk_on_ghost_perk()
