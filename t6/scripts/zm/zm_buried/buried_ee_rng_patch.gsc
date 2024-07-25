@@ -15,7 +15,10 @@ init()
 		setdvar( "scr_force_perk", "specialty_nomotionsensor" );
 		thread onPlayerConnect();
 		thread patch_box();
-		thread patch_2nd_drop_max_ammo();
+
+		if ( maps\mp\_utility::set_dvar_int_if_unset( "patch_max_ammo_richtofen", "1" ) )
+			thread patch_max_ammo();
+
 		thread patch_maze_levers();
 	}
 }
@@ -79,18 +82,18 @@ force_patch_weapon( weapon, player, pap_triggers )
 	return 1;
 }
 
-patch_2nd_drop_max_ammo()
+patch_max_ammo()
 {
 	flag_wait( "zombie_drop_powerups" );
 	wait 0.05;
-
 	arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
-	prev_value = level.zombie_powerup_index;
+	// prev_value = level.zombie_powerup_index;
 
-	do
-		level waittill( "powerup_dropped" );
-	while ( level.zombie_powerup_index == prev_value )
+	// do
+	// 	level waittill( "powerup_dropped" );
+	// while ( level.zombie_powerup_index == prev_value )
 
+	level waittill( "sq_tpo_special_round_ended" );
 	arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index );
 }
 
