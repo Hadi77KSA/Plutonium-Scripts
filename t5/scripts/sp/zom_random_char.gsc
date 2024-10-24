@@ -3,7 +3,7 @@
 
 init()
 {
-	if ( getdvar( "mapname" ) == "zombie_moon" )
+	if ( isSubStr( getdvar( "mapname" ), "zombie_" ) )
 		thread onPlayerConnect();
 }
 
@@ -13,6 +13,7 @@ onPlayerConnect()
 	{
 		level waittill( "connected", player );
 		player.zm_random_char = assign_lowest_unused_character_index();
+		player.entity_num = player.zm_random_char;
 	}
 }
 
@@ -37,6 +38,7 @@ assign_lowest_unused_character_index()
 		for ( i = 0; i < players.size; i++ )
 		{
 			player = players[i];
+
 			if ( isdefined( player.zm_random_char ) )
 			{
 				charindexarray = array_remove( charindexarray, player.zm_random_char );
@@ -46,7 +48,7 @@ assign_lowest_unused_character_index()
 
 		if ( charindexarray.size > 0 )
 		{
-			if ( n_characters_defined == players.size - 1 )
+			if ( ( n_characters_defined == players.size - 1 ) && getdvar( "mapname" ) == "zombie_moon" )
 			{
 				if ( is_in_array( charindexarray, 3 ) )
 					return 3;
