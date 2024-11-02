@@ -1,24 +1,44 @@
+#include maps\mp\zombies\_zm_ffotd;
 #include maps\mp\zombies\_zm_utility;
+
+/*
+
+To disable a persistent upgrade, navigate to the function "*_init_persistent_abilities" of the desired map that
+you wish to disable the upgrade on, and apply any of the following to the "level.pers_upgrade_*" of the upgrade
+you wish to disable:
+
+- Place double slashes (//) before "level.pers_upgrade_*" of the upgrade you wish to disable. Example:
+// level.pers_upgrade_pistol_points = 1;
+
+- Replace the 1 that's after the equal sign (=) with undefined. Example:
+level.pers_upgrade_jugg = undefined;
+
+- Replace the 1 that's after the equal sign (=) with 0. Example:
+level.pers_upgrade_sniper = 0;
+
+Note: Leave the "main_start" function as it currently is to avoid having your toggles be overwritten.
+
+*/
 
 main()
 {
+	replaceFunc( maps\mp\zombies\_zm_ffotd::main_start, ::main_start );
+
 	switch ( getdvar( "mapname" ) )
 	{
 		case "zm_transit":
-			replaceFunc( getFunction( "maps/mp/zm_transit", "init_persistent_abilities" ), ::custom_transit_init_persistent_abilities );
+			replaceFunc( getFunction( "maps/mp/zm_transit", "init_persistent_abilities" ), ::transit_init_persistent_abilities );
 			break;
-
 		case "zm_highrise":
-			replaceFunc( getFunction( "maps/mp/zm_highrise", "init_persistent_abilities" ), ::custom_highrise_init_persistent_abilities );
+			replaceFunc( getFunction( "maps/mp/zm_highrise", "init_persistent_abilities" ), ::highrise_init_persistent_abilities );
 			break;
-
 		case "zm_buried":
-			replaceFunc( getFunction( "maps/mp/zm_buried", "init_persistent_abilities" ), ::custom_buried_init_persistent_abilities );
+			replaceFunc( getFunction( "maps/mp/zm_buried", "init_persistent_abilities" ), ::buried_init_persistent_abilities );
 			break;
 	}
 }
 
-custom_transit_init_persistent_abilities()
+transit_init_persistent_abilities()
 {
 	if ( is_classic() )
 	{
@@ -40,7 +60,7 @@ custom_transit_init_persistent_abilities()
 	}
 }
 
-custom_highrise_init_persistent_abilities()
+highrise_init_persistent_abilities()
 {
 	if ( is_classic() )
 	{
@@ -62,7 +82,7 @@ custom_highrise_init_persistent_abilities()
 	}
 }
 
-custom_buried_init_persistent_abilities()
+buried_init_persistent_abilities()
 {
 	if ( is_classic() )
 	{
@@ -86,4 +106,25 @@ custom_buried_init_persistent_abilities()
 		level.pers_treasure_chest_get_weapons_array_func = getFunction( "maps/mp/zm_buried", "pers_treasure_chest_get_weapons_array_buried" );
 		level.pers_upgrade_nube = 1;
 	}
+}
+
+main_start()
+{
+	mapname = tolower( getdvar( #"mapname" ) );
+	gametype = getdvar( #"ui_gametype" );
+
+	if ( "zm_transit" == tolower( getdvar( #"mapname" ) ) && "zclassic" == getdvar( #"ui_gametype" ) )
+		level thread transit_navcomputer_remove_card_on_success();
+
+	if ( "zm_prison" == tolower( getdvar( #"mapname" ) ) && "zgrief" == getdvar( #"ui_gametype" ) )
+		level.zbarrier_script_string_sets_collision = 1;
+
+/*	if ( ( "zm_transit" == mapname || "zm_highrise" == mapname ) && "zclassic" == gametype )
+	{
+		level.pers_upgrade_sniper = 1;
+		level.pers_upgrade_pistol_points = 1;
+		level.pers_upgrade_perk_lose = 1;
+		level.pers_upgrade_double_points = 1;
+		level.pers_upgrade_nube = 1;
+	} */
 }
