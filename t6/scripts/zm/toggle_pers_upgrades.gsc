@@ -7,7 +7,7 @@ To disable a persistent upgrade, navigate to the function "*_init_persistent_abi
 you wish to disable the upgrade on, and apply any of the following to the "level.pers_upgrade_*" of the upgrade
 you wish to disable:
 
-- Place double slashes (//) before "level.pers_upgrade_*" of the upgrade you wish to disable. Example:
+- Place double slashes (//) at the start of the line. Example:
 // level.pers_upgrade_pistol_points = 1;
 
 - Replace the 1 that's after the equal sign (=) with undefined. Example:
@@ -119,7 +119,7 @@ main_start()
 	if ( "zm_prison" == tolower( getdvar( #"mapname" ) ) && "zgrief" == getdvar( #"ui_gametype" ) )
 		level.zbarrier_script_string_sets_collision = 1;
 
-/*	if ( ( "zm_transit" == mapname || "zm_highrise" == mapname ) && "zclassic" == gametype )
+/* 	if ( ( "zm_transit" == mapname || "zm_highrise" == mapname ) && "zclassic" == gametype )
 	{
 		level.pers_upgrade_sniper = 1;
 		level.pers_upgrade_pistol_points = 1;

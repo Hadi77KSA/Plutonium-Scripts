@@ -7,7 +7,7 @@ for %%I in (%MOD_BASE%\zone_source\*.zone) do call:linker %%~nI
 exit /B
 
 :linker %1
-"%OAT_BASE%\linker.exe" ^
+"%OAT_BASE%\Linker.exe" ^
 -v ^
 --load "%GAME_FOLDER%\zone\Common\%1.ff" ^
 --base-folder "%OAT_BASE%" ^

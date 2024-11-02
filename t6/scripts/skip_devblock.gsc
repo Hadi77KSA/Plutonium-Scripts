@@ -13,9 +13,10 @@ init()
 
 onPlayerConnect()
 {
-	while ( true )
+	for (;;)
 	{
 		level waittill( "connecting", player );
+
 		if ( !getdvarint( "developer_script" ) )
 			player setclientdvar( "scr_skip_devblock", "1" );
 	}
