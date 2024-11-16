@@ -36,17 +36,12 @@ assign_lowest_unused_character_index()
 	}
 	else
 	{
-		n_characters_defined = 0;
-
 		for ( i = 0; i < players.size; i++ )
 		{
 			player = players[i];
 
 			if ( isdefined( player.characterindex ) )
-			{
 				charindexarray = array_remove( charindexarray, player.characterindex );
-				n_characters_defined++;
-			}
 		}
 
 		if ( charindexarray.size > 0 )
