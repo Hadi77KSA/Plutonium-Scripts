@@ -4,7 +4,10 @@
 main()
 {
 	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
+	{
 		replaceFunc( ::give_random_perk, ::patch_give_random_perk );
+		replaceFunc( maps\mp\zm_buried_sq_ctw::ctw_ric_get_next_wisp_struct, ::ctw_ric_get_next_wisp_struct );
+	}
 }
 
 init()
@@ -161,4 +164,16 @@ sq_ml_watch_trigger()
 		wait 0.05;
 		self.n_flip_number = self.n_lever_order;
 	}
+}
+
+ctw_ric_get_next_wisp_struct( s_current )
+{
+	if ( !isdefined( s_current.target ) )
+		return undefined;
+
+	if ( s_current.target == "pf729_auto71" )
+		return getstruct( "pf729_auto70", "target" );
+
+	a_structs = getstructarray( s_current.target, "targetname" );
+	return array_randomize( a_structs )[0];
 }
