@@ -171,9 +171,10 @@ ctw_ric_get_next_wisp_struct( s_current )
 	if ( !isdefined( s_current.target ) )
 		return undefined;
 
-	if ( s_current.target == "pf729_auto71" )
-		return getstruct( "pf729_auto70", "target" );
-
 	a_structs = getstructarray( s_current.target, "targetname" );
+
+	if ( s_current.target == "pf729_auto71" )
+		return a_structs[0];
+
 	return array_randomize( a_structs )[0];
 }
