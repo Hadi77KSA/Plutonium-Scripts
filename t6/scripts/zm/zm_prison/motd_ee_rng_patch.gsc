@@ -1,4 +1,4 @@
-#include common_scrips\utility;
+#include common_scripts\utility;
 #include maps\mp\_utility;
 #include maps\mp\zm_alcatraz_sq;
 #include maps\mp\zm_alcatraz_sq_nixie;
