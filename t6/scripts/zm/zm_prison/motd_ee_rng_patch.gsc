@@ -3,6 +3,7 @@
 #include maps\mp\zm_alcatraz_sq;
 #include maps\mp\zm_alcatraz_sq_nixie;
 #include maps\mp\zombies\_zm_ai_brutus;
+#include maps\mp\zombies\_zm_powerups;
 #include maps\mp\zombies\_zm_score;
 #include maps\mp\zombies\_zm_utility;
 
@@ -10,6 +11,7 @@ main()
 {
 	if ( maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
+		replaceFunc( maps\mp\zombies\_zm_powerups::powerup_drop, ::powerup_drop );
 		replaceFunc( maps\mp\zm_alcatraz_sq::setup_master_key, ::setup_master_key );
 		replaceFunc( maps\mp\zm_alcatraz_sq_nixie::generate_unrestricted_nixie_tube_solution, ::generate_unrestricted_nixie_tube_solution );
 		replaceFunc( maps\mp\zombies\_zm_ai_brutus::brutus_death, ::brutus_death );
@@ -20,6 +22,7 @@ init()
 {
 	if ( maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
+		level.struct_class_names["targetname"]["infirmary_player_spawn"] = array( getStructArray( "infirmary_player_spawn", "targetname" )[3] );
 		thread onPlayerConnect();
 		thread first_round_powerups_patch();
 	}
@@ -43,26 +46,95 @@ display_mod_message()
 
 first_round_powerups_patch()
 {
-	level.zombie_vars["zombie_powerup_drop_max_per_round"] -= 1;
-	arrayremovevalue( level.zombie_powerup_array, "nuke" );
-	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_array.size );
+	// level.zombie_vars["zombie_powerup_drop_max_per_round"] -= 1;
 	arrayremovevalue( level.zombie_powerup_array, "double_points" );
 	arrayinsert( level.zombie_powerup_array, "double_points", level.zombie_powerup_index );
+	arrayremovevalue( level.zombie_powerup_array, "nuke" );
+	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index + 1 );
 	level.zombie_vars["zombie_drop_item"] = true;
+	flag_wait( "initial_blackscreen_passed" );
+	wait 1;
+	level waittill( "powerup_dropped" );
+	level endon( "powerup_dropped" );
 
 	do
 		level waittill( "zom_kill" );
 	while ( get_current_zombie_count() > 0 || level.zombie_total > 0 );
 
-	level.zombie_vars["zombie_powerup_drop_max_per_round"] += 1;
-	arrayremovevalue( level.zombie_powerup_array, "nuke" );
-	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index );
+	// level.zombie_vars["zombie_powerup_drop_max_per_round"] += 1;
+	// arrayremovevalue( level.zombie_powerup_array, "nuke" );
+	// arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index );
 	level.zombie_vars["zombie_drop_item"] = true;
+}
+
+powerup_drop( drop_point )
+{
+	if ( level.powerup_drop_count >= level.zombie_vars["zombie_powerup_drop_max_per_round"] )
+	{
+/#
+		println( "^3POWERUP DROP EXCEEDED THE MAX PER ROUND!" );
+#/
+		return;
+	}
+
+	if ( !isdefined( level.zombie_include_powerups ) || level.zombie_include_powerups.size == 0 )
+		return;
+
+	rand_drop = 3; // randomint( 100 );
+
+	if ( rand_drop > 2 )
+	{
+		if ( !level.zombie_vars["zombie_drop_item"] )
+			return;
+
+		debug = "score";
+	}
+	else
+		debug = "random";
+
+	playable_area = getentarray( "player_volume", "script_noteworthy" );
+	level.powerup_drop_count++;
+	powerup = maps\mp\zombies\_zm_net::network_safe_spawn( "powerup", 1, "script_model", drop_point + vectorscale( ( 0, 0, 1 ), 40.0 ) );
+	valid_drop = 0;
+
+	for ( i = 0; i < playable_area.size; i++ )
+	{
+		if ( powerup istouching( playable_area[i] ) )
+			valid_drop = 1;
+	}
+
+	if ( valid_drop && level.rare_powerups_active )
+	{
+		pos = ( drop_point[0], drop_point[1], drop_point[2] + 42 );
+
+		if ( check_for_rare_drop_override( pos ) )
+		{
+			level.zombie_vars["zombie_drop_item"] = 0;
+			valid_drop = 0;
+		}
+	}
+
+	if ( !valid_drop )
+	{
+		level.powerup_drop_count--;
+		powerup delete();
+		return;
+	}
+
+	powerup powerup_setup();
+	print_powerup_drop( powerup.powerup_name, debug );
+	powerup thread powerup_timeout();
+	powerup thread powerup_wobble();
+	powerup thread powerup_grab();
+	powerup thread powerup_move();
+	powerup thread powerup_emp();
+	level.zombie_vars["zombie_drop_item"] = 0;
+	level notify( "powerup_dropped", powerup );
 }
 
 setup_master_key()
 {
-	level.is_master_key_west = 0; // randomintrange( 0, 2 );
+	level.is_master_key_west = 0; // 0 = cafe, 1 = warden
 	setclientfield( "fake_master_key", level.is_master_key_west + 1 );
 
 	if ( level.is_master_key_west )
@@ -81,44 +153,9 @@ setup_master_key()
 
 generate_unrestricted_nixie_tube_solution()
 {
-	a_restricted_solutions = [];
-	a_restricted_solutions[0] = 115;
-	a_restricted_solutions[1] = 935;
-	a_restricted_solutions[2] = 386;
-	a_restricted_solutions[3] = 481;
-	a_restricted_solutions[4] = 101;
-	a_restricted_solutions[5] = 872;
-	a_numbers = [];
-
-	for ( i = 0; i < 3; i++ )
-		a_numbers[i] = i;
-
-	for ( i = 1; i < 4; i++ )
-	{
-		n_index = randomint( a_numbers.size );
-		level.a_nixie_tube_solution[i] = a_numbers[n_index];
-		arrayremoveindex( a_numbers, n_index );
-	}
-
-	for ( i = 0; i < a_restricted_solutions.size; i++ )
-	{
-		b_is_restricted_solution = 1;
-		restricted_solution = [];
-
-		for ( j = 1; j < 4; j++ )
-		{
-			restricted_solution[j] = get_split_number( j, a_restricted_solutions[i] );
-
-			if ( restricted_solution[j] != level.a_nixie_tube_solution[j] )
-				b_is_restricted_solution = 0;
-		}
-
-		if ( b_is_restricted_solution )
-		{
-			n_index = randomint( a_numbers.size );
-			level.a_nixie_tube_solution[3] = a_numbers[n_index];
-		}
-	}
+	level.a_nixie_tube_solution[1] = 0;
+	level.a_nixie_tube_solution[2] = 1;
+	level.a_nixie_tube_solution[3] = 2;
 }
 
 brutus_death()
