@@ -49,11 +49,14 @@ first_round_powerups_patch()
 	// level.zombie_vars["zombie_powerup_drop_max_per_round"] -= 1;
 	arrayremovevalue( level.zombie_powerup_array, "double_points" );
 	arrayinsert( level.zombie_powerup_array, "double_points", level.zombie_powerup_index );
+	arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
+	arrayinsert( level.zombie_powerup_array, "full_ammo", level.zombie_powerup_index + 1 );
 	arrayremovevalue( level.zombie_powerup_array, "nuke" );
-	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index + 1 );
+	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index + 2 );
 	level.zombie_vars["zombie_drop_item"] = true;
 	flag_wait( "initial_blackscreen_passed" );
 	wait 1;
+	level waittill( "powerup_dropped" );
 	level waittill( "powerup_dropped" );
 	level endon( "powerup_dropped" );
 
