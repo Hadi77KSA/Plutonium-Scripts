@@ -6,7 +6,7 @@ main()
 	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		replaceFunc( ::give_random_perk, ::patch_give_random_perk );
-		replaceFunc( maps\mp\zm_buried_sq_ctw::ctw_ric_get_next_wisp_struct, ::ctw_ric_get_next_wisp_struct );
+		replaceFunc( maps\mp\zm_buried_sq_ip::sq_ml_spawn_lever, ::sq_ml_spawn_lever );
 	}
 }
 
@@ -16,12 +16,31 @@ init()
 	{
 		setdvar( "scr_force_weapon", "" );
 		setdvar( "scr_force_perk", "specialty_nomotionsensor" );
+		level.customspawnlogic = ::spawn_host_closest_to_hole; //patch host initial spawn
+
+		//patch wisp code to always be DLC
+		foreach ( m_sign in getentarray( "sq_tunnel_sign", "targetname" ) )
+		{
+			switch ( m_sign.model )
+			{
+				case "p6_zm_bu_sign_tunnel_dry":
+				case "p6_zm_bu_sign_tunnel_lunger":
+				case "p6_zm_bu_sign_tunnel_consumption":
+					m_sign.is_max_sign = 1;
+					m_sign.is_ric_sign = 1;
+					break;
+				default:
+					m_sign.is_max_sign = undefined;
+					m_sign.is_ric_sign = undefined;
+					break;
+			}
+		}
+
+		level.struct_class_names["targetname"]["pf729_auto71"] = array( getstructarray( "pf729_auto71", "targetname" )[0] ); //patch Richtofen wisp to always go from General Store to Candy Store
+		level._maze._perms = array( array( "blocker_1", "blocker_10", "blocker_6", "blocker_4", "blocker_11" ) ); //patch Maze doors
 		thread onPlayerConnect();
 		thread patch_box();
-
-		if ( maps\mp\_utility::set_dvar_int_if_unset( "patch_max_ammo_richtofen", "1" ) )
-			thread patch_max_ammo();
-
+		thread patch_powerups();
 		thread patch_maze_levers();
 	}
 }
@@ -43,12 +62,25 @@ display_mod_message()
 	self iPrintLn( "Script ''buried_ee_rng_patch.gsc'' loaded successfully" );
 }
 
+spawn_host_closest_to_hole( predictedspawn )
+{
+	spawnpoint = getstructarray( "initial_spawn_points", "targetname" )[7];
+
+	if ( predictedspawn )
+		self predictspawnpoint( spawnpoint.origin, spawnpoint.angles );
+	else
+		self spawn( spawnpoint.origin, spawnpoint.angles, "zsurvival" );
+
+	level.check_for_valid_spawn_near_team_callback = undefined;
+	return spawnpoint;
+}
+
 patch_box()
 {
 	patch_weapons = [];
 	patch_weapons[patch_weapons.size] = "slowgun_zm";
 	patch_weapons[patch_weapons.size] = "time_bomb_zm";
-	patch_weapons = array_randomize( patch_weapons );
+	// patch_weapons = array_randomize( patch_weapons );
 	flag_wait( "initial_players_connected" );
 	// desired_max_target_of_hits = 2;
 
@@ -85,10 +117,10 @@ force_patch_weapon( weapon, player, pap_triggers )
 	return 1;
 }
 
-patch_max_ammo()
+patch_powerups()
 {
-	flag_wait( "zombie_drop_powerups" );
-	wait 0.05;
+	arrayremovevalue( level.zombie_powerup_array, "nuke" );
+	arrayinsert( level.zombie_powerup_array, "nuke", level.zombie_powerup_index );
 	arrayremovevalue( level.zombie_powerup_array, "full_ammo" );
 	// prev_value = level.zombie_powerup_index;
 
@@ -131,7 +163,6 @@ patch_give_random_perk()
 	if ( perks.size > 0 )
 	{
 		perks = array_randomize( perks );
-
 		forced_perk = getdvar( "scr_force_perk" );
 
 		if ( forced_perk != "" && isinarray( perks, forced_perk ) )
@@ -166,15 +197,39 @@ sq_ml_watch_trigger()
 	}
 }
 
-ctw_ric_get_next_wisp_struct( s_current )
+sq_ml_spawn_lever( n_index )
 {
-	if ( !isdefined( s_current.target ) )
-		return undefined;
+	m_lever = spawn( "script_model", ( 0, 0, 0 ) );
+	m_lever setmodel( self.model );
+	m_lever.targetname = "sq_ml_lever";
 
-	a_structs = getstructarray( s_current.target, "targetname" );
+	while ( true )
+	{
+		v_spot = self.origin;
+		v_angles = self.angles;
 
-	if ( s_current.target == "pf729_auto71" )
-		return a_structs[0];
+		if ( isdefined( level._maze._active_perm_list[n_index] ) )
+		{
+			is_flip = level._maze._active_perm_list[n_index] == "blocker_1" || level._maze._active_perm_list[n_index] == "blocker_6"; //patch levers sides
+			s_spot = getstruct( level._maze._active_perm_list[n_index], "script_noteworthy" );
+			v_right = anglestoright( s_spot.angles );
+			v_offset = vectornormalize( v_right ) * 2;
 
-	return array_randomize( a_structs )[0];
+			if ( is_flip )
+				v_offset = v_offset * -1;
+
+			v_spot = s_spot.origin + vectorscale( ( 0, 0, 1 ), 48.0 ) + v_offset;
+			v_angles = s_spot.angles + vectorscale( ( 0, 1, 0 ), 90.0 );
+
+			if ( is_flip )
+				v_angles = s_spot.angles - vectorscale( ( 0, 1, 0 ), 90.0 );
+		}
+
+		m_lever.origin = v_spot;
+		m_lever.angles = v_angles;
+/#
+		m_lever thread sq_ml_show_lever_debug( v_spot, n_index );
+#/
+		level waittill( "zm_buried_maze_changed" );
+	}
 }
