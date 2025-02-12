@@ -1,4 +1,5 @@
 #include common_scripts\utility;
+#include maps\mp\zm_buried_sq_ip;
 #include maps\mp\zombies\_zm_perks;
 
 main()
@@ -64,7 +65,7 @@ display_mod_message()
 
 spawn_host_closest_to_hole( predictedspawn )
 {
-	spawnpoint = getstructarray( "initial_spawn_points", "targetname" )[7];
+	spawnpoint = getstructarray( "initial_spawn_points", "targetname" )[7]; //4 is also a close spawn
 
 	if ( predictedspawn )
 		self predictspawnpoint( spawnpoint.origin, spawnpoint.angles );
