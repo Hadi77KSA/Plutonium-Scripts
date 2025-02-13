@@ -7,6 +7,7 @@ init()
 		case "nazi_zombie_sumpf":
 		case "nazi_zombie_factory":
 			thread onPlayerConnect();
+			break;
 	}
 }
 
