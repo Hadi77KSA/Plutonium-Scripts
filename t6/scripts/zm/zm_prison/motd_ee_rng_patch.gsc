@@ -1,5 +1,6 @@
 #include common_scripts\utility;
 #include maps\mp\_utility;
+#include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_alcatraz_sq;
 #include maps\mp\zm_alcatraz_sq_nixie;
 #include maps\mp\zombies\_zm_ai_brutus;
@@ -23,9 +24,17 @@ init()
 	if ( maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		level.struct_class_names["targetname"]["infirmary_player_spawn"] = array( getStructArray( "infirmary_player_spawn", "targetname" )[3] );
+		hud_elem();
 		thread onPlayerConnect();
 		thread first_round_powerups_patch();
 	}
+}
+
+hud_elem()
+{
+	text = createServerFontString( "default", 1.5 );
+	text setPoint( "BOTTOM", "CENTER", 0, 200 );
+	text settext( "^6motd_ee_rng_patch.gsc" );
 }
 
 onPlayerConnect()
