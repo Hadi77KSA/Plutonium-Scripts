@@ -1,4 +1,5 @@
 #include common_scripts\utility;
+#include maps\mp\gametypes_zm\_hud_util;
 #include maps\mp\zm_buried_sq_ip;
 #include maps\mp\zombies\_zm_perks;
 
@@ -39,11 +40,19 @@ init()
 
 		level.struct_class_names["targetname"]["pf729_auto71"] = array( getstructarray( "pf729_auto71", "targetname" )[0] ); //patch Richtofen wisp to always go from General Store to Candy Store
 		level._maze._perms = array( array( "blocker_1", "blocker_10", "blocker_6", "blocker_4", "blocker_11" ) ); //patch Maze doors
+		hud_elem();
 		thread onPlayerConnect();
 		thread patch_box();
 		thread patch_powerups();
 		thread patch_maze_levers();
 	}
+}
+
+hud_elem()
+{
+	text = createServerFontString( "default", 1.5 );
+	text setPoint( "BOTTOM", "CENTER", 0, 200 );
+	text settext( "^6buried_ee_rng_patch.gsc" );
 }
 
 onPlayerConnect()
