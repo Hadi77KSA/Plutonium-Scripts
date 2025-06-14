@@ -1,11 +1,11 @@
 //This script modifies the score colours as well as the gamertag colours based on the player.entity_num of each player
 init()
 {
-	level.score_colours = [];
-	level.score_colours[0] = "1 1 1 0";                         //white
-	level.score_colours[1] = "0.486275 0.811765 0.933333 0";    //blue
-	level.score_colours[2] = "0.964706 0.792157 0.313726 0";    //yellow
-	level.score_colours[3] = "0.513726 0.92549 0.533333 0";     //green
+	level.color_order = [];
+	level.color_order[0] = "1 1 1 0";                         //white
+	level.color_order[1] = "0.486275 0.811765 0.933333 0";    //blue
+	level.color_order[2] = "0.964706 0.792157 0.313726 0";    //yellow
+	level.color_order[3] = "0.513726 0.92549 0.533333 0";     //green
 	thread onPlayerConnect();
 }
 
@@ -14,11 +14,11 @@ onPlayerConnect()
 	for (;;)
 	{
 		level waittill( "connected", player );
-		player thread setScoresColors();
+		player thread color_order();
 	}
 }
 
-setScoresColors()
+color_order()
 {
 	self endon( "disconnect" );
 	common_scripts\utility::flag_wait( "all_players_spawned" );
@@ -27,8 +27,18 @@ setScoresColors()
 	{
 		players = getPlayers();
 
-		for ( i = 0; i < 4 && i < players.size; i++ )
-			self setClientDvar( "cg_ScoresColor_Gamertag_" + i, level.score_colours[players[i].entity_num] );
+		switch ( players.size )
+		{
+			case 4:
+				self setClientDvar( "cg_ScoresColor_Gamertag_3", level.color_order[players[3].entity_num] );
+			case 3:
+				self setClientDvar( "cg_ScoresColor_Gamertag_2", level.color_order[players[2].entity_num] );
+			case 2:
+				self setClientDvar( "cg_ScoresColor_Gamertag_1", level.color_order[players[1].entity_num] );
+			case 1:
+				self setClientDvar( "cg_ScoresColor_Gamertag_0", level.color_order[players[0].entity_num] );
+				break;
+		}
 
 		level waittill( "connected" );
 		wait 0.05;
