@@ -7,7 +7,7 @@ main()
 {
 	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
-		replaceFunc( ::give_random_perk, ::patch_give_random_perk );
+		replaceFunc( maps\mp\zombies\_zm_perks::give_random_perk, ::give_random_perk );
 		replaceFunc( maps\mp\zm_buried_sq_ip::sq_ml_spawn_lever, ::sq_ml_spawn_lever );
 	}
 }
@@ -25,9 +25,9 @@ init()
 		{
 			switch ( m_sign.model )
 			{
-				case "p6_zm_bu_sign_tunnel_dry":
+				case "p6_zm_bu_sign_tunnel_bone":
 				case "p6_zm_bu_sign_tunnel_lunger":
-				case "p6_zm_bu_sign_tunnel_consumption":
+				case "p6_zm_bu_sign_tunnel_ground":
 					m_sign.is_max_sign = 1;
 					m_sign.is_ric_sign = 1;
 					break;
@@ -81,7 +81,7 @@ spawn_host_closest_to_hole( predictedspawn )
 	else
 		self spawn( spawnpoint.origin, spawnpoint.angles, "zsurvival" );
 
-	level.check_for_valid_spawn_near_team_callback = undefined;
+	level.customspawnlogic = undefined;
 	return spawnpoint;
 }
 
@@ -149,8 +149,7 @@ unpatch_random_perk_on_ghost_perk()
 	wait 0.05;
 	setdvar( "scr_force_perk", "" );
 }
-
-patch_give_random_perk()
+give_random_perk()
 {
 	random_perk = undefined;
 	vending_triggers = getentarray( "zombie_vending", "targetname" );
