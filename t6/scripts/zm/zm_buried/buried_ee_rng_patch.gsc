@@ -149,6 +149,7 @@ unpatch_random_perk_on_ghost_perk()
 	wait 0.05;
 	setdvar( "scr_force_perk", "" );
 }
+
 give_random_perk()
 {
 	random_perk = undefined;
