@@ -2,13 +2,7 @@
 
 init()
 {
-	switch( getdvar( "mapname" ) )
-	{
-		case "nazi_zombie_sumpf":
-		case "nazi_zombie_factory":
-			thread onPlayerConnect();
-			break;
-	}
+	thread onPlayerConnect();
 }
 
 onPlayerConnect()
