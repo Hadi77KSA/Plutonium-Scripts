@@ -12,7 +12,7 @@ onPlayerConnect()
 		return;
 	}
 
-	weaponData = getWeaponData( "galil_upgraded_zm+reflex" );
+	weaponData = getWeaponData( "tar21_upgraded_zm+reflex" );
 
 	for (;;)
 	{
