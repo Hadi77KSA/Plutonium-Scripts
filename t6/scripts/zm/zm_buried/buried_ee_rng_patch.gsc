@@ -17,17 +17,17 @@ init()
 	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		setdvar( "scr_force_weapon", "" );
-		setdvar( "scr_force_perk", "specialty_nomotionsensor" );
+		setdvar( "scr_force_perk", "6" ); // { 0: Jugg, 1: DoubleTap, 2: MuleKick, 3: PaP, 4: QR, 5: StaminUp, 6: Vulture, 7: SpeedCola }
 		level.customspawnlogic = ::spawn_host_closest_to_hole; //patch host initial spawn
 
-		//patch wisp code to always be DLC
+		//patch wisp code to always be GLB
 		foreach ( m_sign in getentarray( "sq_tunnel_sign", "targetname" ) )
 		{
 			switch ( m_sign.model )
 			{
-				case "p6_zm_bu_sign_tunnel_bone":
-				case "p6_zm_bu_sign_tunnel_lunger":
 				case "p6_zm_bu_sign_tunnel_ground":
+				case "p6_zm_bu_sign_tunnel_lunger":
+				case "p6_zm_bu_sign_tunnel_bone":
 					m_sign.is_max_sign = 1;
 					m_sign.is_ric_sign = 1;
 					break;
@@ -61,11 +61,11 @@ onPlayerConnect()
 	{
 		level waittill( "connected", player );
 		player thread unpatch_random_perk_on_ghost_perk();
-		player thread display_mod_message();
+		player thread msg();
 	}
 }
 
-display_mod_message()
+msg()
 {
 	self endon( "disconnect" );
 	flag_wait( "initial_players_connected" );
@@ -146,7 +146,7 @@ unpatch_random_perk_on_ghost_perk()
 {
 	self endon( "disconnect" );
 	self waittill( "player_received_ghost_round_free_perk" );
-	wait 0.05;
+	waittillframeend;
 	setdvar( "scr_force_perk", "" );
 }
 
@@ -173,10 +173,10 @@ give_random_perk()
 	if ( perks.size > 0 )
 	{
 		perks = array_randomize( perks );
-		forced_perk = getdvar( "scr_force_perk" );
+		forced_perk = maps\mp\_utility::getDvarIntDefault( "scr_force_perk", "" );
 
-		if ( forced_perk != "" && isinarray( perks, forced_perk ) )
-			arrayinsert( perks, forced_perk, 0 );
+		if ( forced_perk != "" && isdefined( vending_triggers[forced_perk].script_noteworthy ) && isinarray( perks, vending_triggers[forced_perk].script_noteworthy ) )
+			arrayinsert( perks, vending_triggers[forced_perk].script_noteworthy, 0 );
 
 		random_perk = perks[0];
 		self give_perk( random_perk );
@@ -202,7 +202,7 @@ sq_ml_watch_trigger()
 	for (;;)
 	{
 		self.trig waittill( "trigger" );
-		wait 0.05;
+		waittillframeend;
 		self.n_flip_number = self.n_lever_order;
 	}
 }
