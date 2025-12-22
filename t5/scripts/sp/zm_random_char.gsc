@@ -12,24 +12,23 @@ onPlayerConnect()
 	for (;;)
 	{
 		level waittill( "connected", player );
-		player.zm_random_char = assign_lowest_unused_character_index();
+		player.zm_random_char = characterindex();
 		player.entity_num = player.zm_random_char;
 	}
 }
 
-assign_lowest_unused_character_index()
+characterindex()
 {
-	charindexarray = [];
-	charindexarray[0] = 0;
-	charindexarray[1] = 1;
-	charindexarray[2] = 2;
-	charindexarray[3] = 3;
+	characterindex = [];
+	characterindex[0] = 0;
+	characterindex[1] = 1;
+	characterindex[2] = 2;
+	characterindex[3] = 3;
 	players = get_players();
 
 	if ( players.size == 1 )
 	{
-		charindexarray = array_randomize( charindexarray );
-		return charindexarray[0];
+		return characterindex[randomInt( characterindex.size )];
 	}
 	else
 	{
@@ -41,18 +40,19 @@ assign_lowest_unused_character_index()
 
 			if ( isdefined( player.zm_random_char ) )
 			{
-				charindexarray = array_remove( charindexarray, player.zm_random_char );
+				characterindex = array_remove( characterindex, player.zm_random_char );
 				n_characters_defined++;
 			}
 		}
 
-		if ( charindexarray.size > 0 )
+		if ( characterindex.size > 0 )
 		{
-			if ( ( n_characters_defined == players.size - 1 ) && getdvar( "mapname" ) == "zombie_moon" && is_in_array( charindexarray, 3 ) )
+			if ( getdvar( "mapname" ) == "zombie_moon" && ( n_characters_defined == players.size - 1 ) && is_in_array( characterindex, 3 ) )
+			{
 				return 3;
+			}
 
-			charindexarray = array_randomize( charindexarray );
-			return charindexarray[0];
+			return characterindex[randomInt( characterindex.size )];
 		}
 	}
 

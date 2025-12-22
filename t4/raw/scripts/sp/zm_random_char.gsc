@@ -10,24 +10,23 @@ onPlayerConnect()
 	for (;;)
 	{
 		level waittill( "connected", player );
-		player.characterindex = assign_lowest_unused_character_index();
+		player.characterindex = characterindex();
 		player.entity_num = player.characterindex;
 	}
 }
 
-assign_lowest_unused_character_index()
+characterindex()
 {
-	charindexarray = [];
-	charindexarray[0] = 0;
-	charindexarray[1] = 1;
-	charindexarray[2] = 2;
-	charindexarray[3] = 3;
+	characterindex = [];
+	characterindex[0] = 0;
+	characterindex[1] = 1;
+	characterindex[2] = 2;
+	characterindex[3] = 3;
 	players = getPlayers();
 
 	if ( players.size == 1 )
 	{
-		charindexarray = array_randomize( charindexarray );
-		return charindexarray[0];
+		return characterindex[randomInt( characterindex.size )];
 	}
 	else
 	{
@@ -36,13 +35,14 @@ assign_lowest_unused_character_index()
 			player = players[i];
 
 			if ( isdefined( player.characterindex ) )
-				charindexarray = array_remove( charindexarray, player.characterindex );
+			{
+				characterindex = array_remove( characterindex, player.characterindex );
+			}
 		}
 
-		if ( charindexarray.size > 0 )
+		if ( characterindex.size > 0 )
 		{
-			charindexarray = array_randomize( charindexarray );
-			return charindexarray[0];
+			return characterindex[randomInt( characterindex.size )];
 		}
 	}
 
