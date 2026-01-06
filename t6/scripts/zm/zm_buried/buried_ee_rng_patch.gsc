@@ -20,20 +20,25 @@ init()
 		setdvar( "scr_force_perk", "6" ); // { 0: Jugg, 1: DoubleTap, 2: MuleKick, 3: PaP, 4: QR, 5: StaminUp, 6: Vulture, 7: SpeedCola }
 		level.customspawnlogic = ::spawn_host_closest_to_hole; //patch host initial spawn
 
-		//patch wisp code to always be GLB
+		//patch wisp code to always be DLC for Maxis, and GLB for Richtofen
+		//either combination can be used despite what the lantern code shows
 		foreach ( m_sign in getentarray( "sq_tunnel_sign", "targetname" ) )
 		{
 			switch ( m_sign.model )
 			{
-				case "p6_zm_bu_sign_tunnel_ground":
-				case "p6_zm_bu_sign_tunnel_lunger":
-				case "p6_zm_bu_sign_tunnel_bone":
+				case "p6_zm_bu_sign_tunnel_dry":
+				case "p6_zm_bu_sign_tunnel_consumption":
 					m_sign.is_max_sign = 1;
+					m_sign.is_ric_sign = undefined;
+					break;
+				case "p6_zm_bu_sign_tunnel_ground":
+				case "p6_zm_bu_sign_tunnel_bone":
+					m_sign.is_max_sign = undefined;
 					m_sign.is_ric_sign = 1;
 					break;
-				default:
-					m_sign.is_max_sign = undefined;
-					m_sign.is_ric_sign = undefined;
+				case "p6_zm_bu_sign_tunnel_lunger":
+					m_sign.is_max_sign = 1;
+					m_sign.is_ric_sign = 1;
 					break;
 			}
 		}
@@ -104,7 +109,7 @@ patch_box()
 	level.custom_magic_box_selection_logic = ::force_patch_weapon;
 	pap_triggers = getentarray( "specialty_weapupgrade", "script_noteworthy" );
 
-	foreach( weapon in patch_weapons )
+	foreach ( weapon in patch_weapons )
 	{
 		if ( maps\mp\zombies\_zm_magicbox::treasure_chest_canplayerreceiveweapon( getPlayers()[0], weapon, pap_triggers ) )
 			setdvar( "scr_force_weapon", weapon );
