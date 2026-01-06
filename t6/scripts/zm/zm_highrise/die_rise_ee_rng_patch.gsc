@@ -28,8 +28,10 @@ init()
 {
 	if ( getdvar( "mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
+		maps\mp\_utility::set_dvar_if_unset( "scr_force_weapon", "knife_ballistic_zm" );
 		hud_elem();
 		thread onPlayerConnect();
+		thread patch_box();
 	}
 }
 
@@ -45,13 +47,34 @@ onPlayerConnect()
 	for (;;)
 	{
 		level waittill( "connected", player );
-		player thread display_mod_message();
+		player thread msg();
 	}
 }
 
-display_mod_message()
+msg()
 {
 	self endon( "disconnect" );
 	flag_wait( "initial_players_connected" );
 	self iPrintLn( "Script ''die_rise_ee_rng_patch.gsc'' loaded successfully" );
+}
+
+patch_box()
+{
+	flag_wait( "initial_players_connected" );
+	prev_func = level.custom_magic_box_selection_logic;
+	level.custom_magic_box_selection_logic = ::force_patch_weapon;
+	level waittill( "chest_has_been_used" );
+	wait 5;
+	setdvar( "scr_force_weapon", "" );
+	level.custom_magic_box_selection_logic = prev_func;
+}
+
+force_patch_weapon( weapon, player, pap_triggers )
+{
+	forced_weapon = getdvar( #"scr_force_weapon" );
+
+	if ( forced_weapon != "" && isdefined( level.zombie_weapons[forced_weapon] ) )
+		return weapon == forced_weapon;
+
+	return 1;
 }
