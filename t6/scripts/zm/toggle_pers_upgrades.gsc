@@ -24,7 +24,7 @@ main()
 {
 	replaceFunc( maps\mp\zombies\_zm_ffotd::main_start, ::main_start );
 
-	switch ( getdvar( "mapname" ) )
+	switch ( getdvar( #"mapname" ) )
 	{
 		case "zm_transit":
 			replaceFunc( getFunction( "maps/mp/zm_transit", "init_persistent_abilities" ), ::transit_init_persistent_abilities );

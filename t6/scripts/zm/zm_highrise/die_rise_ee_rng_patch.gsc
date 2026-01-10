@@ -3,7 +3,7 @@
 
 main()
 {
-	if ( getdvar( "mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
+	if ( getdvar( #"mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		replaceFunc( maps\mp\zm_highrise_buildables::include_buildables, ::include_buildables );
 	}
@@ -26,7 +26,7 @@ include_buildables()
 
 init()
 {
-	if ( getdvar( "mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
+	if ( getdvar( #"mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		maps\mp\_utility::set_dvar_if_unset( "scr_force_weapon", "knife_ballistic_zm" );
 		hud_elem();

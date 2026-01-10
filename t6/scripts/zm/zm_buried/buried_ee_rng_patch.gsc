@@ -5,7 +5,7 @@
 
 main()
 {
-	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
+	if ( getdvar( #"mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		replaceFunc( maps\mp\zombies\_zm_perks::give_random_perk, ::give_random_perk );
 		replaceFunc( maps\mp\zm_buried_sq_ip::sq_ml_spawn_lever, ::sq_ml_spawn_lever );
@@ -14,7 +14,7 @@ main()
 
 init()
 {
-	if ( getdvar( "mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
+	if ( getdvar( #"mapname" ) == "zm_buried" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		setdvar( "scr_force_weapon", "" );
 		setdvar( "scr_force_perk", "6" ); // { 0: Jugg, 1: DoubleTap, 2: MuleKick, 3: PaP, 4: QR, 5: StaminUp, 6: Vulture, 7: SpeedCola }

@@ -3,7 +3,7 @@
 
 init()
 {
-	if ( isSubStr( getdvar( "mapname" ), "zombie_" ) )
+	if ( isSubStr( getdvar( #"mapname" ), "zombie_" ) )
 		thread onPlayerConnect();
 }
 
@@ -47,7 +47,7 @@ characterindex()
 
 		if ( characterindex.size > 0 )
 		{
-			if ( getdvar( "mapname" ) == "zombie_moon" && ( n_characters_defined == players.size - 1 ) && is_in_array( characterindex, 3 ) )
+			if ( getdvar( #"mapname" ) == "zombie_moon" && ( n_characters_defined == players.size - 1 ) && is_in_array( characterindex, 3 ) )
 			{
 				return 3;
 			}
