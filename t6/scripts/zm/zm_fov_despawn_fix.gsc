@@ -1,15 +1,8 @@
 main()
 {
 	replaceFunc( maps\mp\zombies\_zm_ai_faller::in_player_fov, ::in_player_fov );
-
-	str = getdvar( "mapname" );
-
-	if ( str == "zm_prison" )
-	{
-		str = "zm_alcatraz";
-	}
-
-	func = getFunction( "maps\\mp\\" + str + "_distance_tracking", "player_can_see_me" );
+	str = getDvar( #"mapname" );
+	func = getFunction( "maps\\mp\\" + ( ( str == "zm_prison" ) ? "zm_alcatraz" : str ) + "_distance_tracking", "player_can_see_me" );
 
 	if ( isdefined( func ) )
 	{
