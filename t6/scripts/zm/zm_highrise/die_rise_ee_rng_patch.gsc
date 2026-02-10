@@ -6,6 +6,7 @@ main()
 	if ( getdvar( #"mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
 	{
 		replaceFunc( maps\mp\zm_highrise_buildables::include_buildables, ::include_buildables );
+		replaceFunc( maps\mp\zm_highrise_sq::mahjong_tiles_setup, ::mahjong_tiles_setup );
 	}
 }
 
@@ -24,6 +25,43 @@ include_buildables()
 	maps\mp\zm_highrise_buildables::include_buildables();
 }
 
+mahjong_tiles_setup()
+{
+	a_winds = array( "north", "west", "south", "east" ); //patch tower order
+	//a_winds = array_randomize( array( "north", "south", "east", "west" ) );
+	a_colors = array_randomize( array( "blk", "blu", "grn", "red" ) );
+	a_locs = array_randomize( getstructarray( "sq_tile_loc_random", "targetname" ) );
+	assert( a_locs.size > a_winds.size, "zm_highrise_sq: not enough locations for mahjong tiles!" );
+	a_wind_order = array( "none" );
+
+	for ( i = 0; i < a_winds.size; i++ )
+	{
+		a_wind_order[a_wind_order.size] = a_winds[i];
+		m_wind_tile = getent( "tile_" + a_winds[i] + "_" + a_colors[i], "targetname" );
+		m_wind_tile.script_noteworthy = undefined;
+		s_spot = a_locs[i];
+
+		if ( a_winds[i] == "north" )
+			s_spot = getstruct( "sq_tile_loc_north", "targetname" );
+
+		m_wind_tile.origin = s_spot.origin;
+		m_wind_tile.angles = s_spot.angles;
+	}
+
+	for ( i = 0; i < a_colors.size; i++ )
+	{
+		m_num_tile = getent( "tile_" + ( i + 1 ) + "_" + a_colors[i], "targetname" );
+		m_num_tile.script_noteworthy = undefined;
+		s_spot = a_locs[i + a_winds.size];
+		m_num_tile.origin = s_spot.origin;
+		m_num_tile.angles = s_spot.angles;
+	}
+
+	a_tiles = getentarray( "mahjong_tile", "script_noteworthy" );
+	array_delete( a_tiles );
+	level.a_wind_order = a_winds;
+}
+
 init()
 {
 	if ( getdvar( #"mapname" ) == "zm_highrise" && maps\mp\zombies\_zm_sidequests::is_sidequest_allowed( "zclassic" ) )
@@ -32,6 +70,7 @@ init()
 		hud_elem();
 		thread onPlayerConnect();
 		thread patch_box();
+		thread sq_atd_drg_puzzle(); //patch floor symbols
 	}
 }
 
@@ -77,4 +116,53 @@ force_patch_weapon( weapon, player, pap_triggers )
 		return weapon == forced_weapon;
 
 	return 1;
+}
+
+sq_atd_drg_puzzle()
+{
+	flag_wait( "sq_atd_elevator_activated" );
+
+	while ( !isdefined( level.sq_atd_cur_drg ) )
+	{
+		wait 0.25;
+	}
+
+	a_puzzle_trigs = getEntArray( "trig_atd_drg_puzzle", "targetname" );
+
+	for ( i = 0; i < a_puzzle_trigs.size; i++ )
+	{
+		a_puzzle_trigs[i] thread drg_puzzle_trig_think();
+	}
+}
+
+drg_puzzle_trig_think()
+{
+	drg_active = 0;
+	m_unlit = getent( self.target, "targetname" );
+	m_lit = m_unlit.lit_icon;
+	v_top = m_unlit.origin;
+	v_hidden = m_lit.origin;
+	self waittill( "trigger", e_who );
+
+	while ( !flag( "sq_atd_drg_puzzle_complete" ) )
+	{
+		waittillframeend;
+
+		if ( drg_active || !self.drg_active )
+		{
+			m_lit.origin = v_top;
+			m_unlit.origin = v_hidden;
+			m_lit playsound( "zmb_sq_symbol_light" );
+			self.drg_active = 1;
+			level thread maps\mp\zm_highrise_sq_atd::vo_richtofen_atd_order( level.sq_atd_cur_drg );
+			level.sq_atd_cur_drg++;
+		}
+
+		drg_active = 1;
+
+		while ( e_who istouching( self ) )
+			wait 0.5;
+
+		level maps\mp\_utility::waittill_either( "sq_atd_drg_puzzle_complete", "drg_puzzle_reset" );
+	}
 }
