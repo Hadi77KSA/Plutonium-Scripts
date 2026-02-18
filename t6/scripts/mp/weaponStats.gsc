@@ -7,7 +7,7 @@
 //
 // This script will generate a "weaponStats.txt" file containing entries for all weapons with the generic structure of
 // how the data must be entered.
-// Open that file and change the 0 to whichever value you wish the value of the stat to increase by.
+// Open that file and change the 0 to whichever amount you wish the current value of the stat to increase by.
 // e.g. if headshots in-game is 10 and you want it to go to 200, go to weaponStats.txt and change the 0 to 190 or more.
 //
 // The default path of weaponStats.txt is as follows:
@@ -17,6 +17,14 @@
 //
 // In order for the script to work, start a match using these commands while in the main lobby:
 // "set increaseWeaponStats on; xstartpartyhost; wait 500; xpartygo"
+//
+// Weapon xp and prestige can be set through the following console commands:
+// statWriteDDL itemStats {weaponIndex} xp {value}
+// statWriteDDL itemStats {weaponIndex} plevel {value}
+//
+// Example: If you wish to set the Mk 48's xp and prestige to max, you would use this: 
+// statWriteDDL itemStats 36 xp 45400
+// statWriteDDL itemStats 36 plevel 2
 
 init()
 {
@@ -119,6 +127,7 @@ weaponStats()
 			}
 
 			fs_writeLine( file, level.tbl_weaponids[i]["reference"] + "_mp" );
+			fs_writeLine( file, "Weapon index = " + i );
 			fs_writeLine( file, statName + " = 0" );
 
 			switch ( level.tbl_weaponids[i]["group"] )
@@ -223,6 +232,11 @@ weaponStats()
 		{
 			weapon = strTok( line, ";" );
 
+			if ( !isdefined( weapon[1] ) || weapon[1] != "attachment" )
+			{
+				fs_readLine( file );
+			}
+
 			for ( i = ( isdefined( weapon[1] ) && weapon[1] == "attachment" ) ? 1 : 0; i < 6; i++ )
 			{
 				data = strTok( fs_readLine( file ), " = " );
@@ -238,7 +252,7 @@ weaponStats()
 				}
 			}
 
-			line = fs_readLine( file );
+			fs_readLine( file );
 			wait 0.05;
 		}
 
